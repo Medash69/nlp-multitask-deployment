@@ -1,0 +1,9 @@
+{
+  "architectures": ["CamembertForSequenceClassification"],
+  "model_type": "camembert",
+  "num_labels": 2,
+  "id2label": {"0": "NEGATIVE", "1": "POSITIVE"},
+  "label2id": {"NEGATIVE": 0, "POSITIVE": 1},
+  "max_position_embeddings": 514,
+  "vocab_size": 32005
+}

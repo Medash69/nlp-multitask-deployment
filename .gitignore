@@ -1,0 +1,12 @@
+git init -b main
+
+# Créer le fichier .gitignore
+cat > .gitignore << 'EOF'
+__pycache__/
+venv/
+.env
+*.pt
+*.bin
+*.model
+.vscode/
+EOF
