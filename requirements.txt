@@ -1,11 +1,12 @@
-fastapi==0.114.0
-uvicorn[standard]==0.23.2
+fastapi==0.128.0
+uvicorn[standard]==0.22.0
 pydantic==2.5.0
 transformers==4.35.2
 sentencepiece==0.1.99
-torch --index-url https://download.pytorch.org/whl/cpu
-pandas
-numpy
+torch==2.8.0+cpu
+--find-links https://download.pytorch.org/whl/cpu
+pandas==2.1.0
+numpy==2.0.2
 opencensus-ext-azure==1.1.9
-httpx
-pytest
+httpx==0.28.1
+pytest==8.4.2

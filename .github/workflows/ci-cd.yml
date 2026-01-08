@@ -22,12 +22,14 @@ jobs:
 
       - name: Run Tests (Mocks)
         run: |
-          pip install fastapi==0.114.0 uvicorn[standard]==0.23.2 \
-            pydantic==2.5.0 transformers==4.35.2 sentencepiece==0.1.99 \
-            torch --index-url https://download.pytorch.org/whl/cpu \
-            pandas numpy opencensus-ext-azure==1.1.9 \
-            httpx pytest
-
+          # Installer les packages PyPI normaux
+          pip install fastapi uvicorn pydantic transformers sentencepiece pandas numpy opencensus-ext-azure httpx pytest
+          
+          # Installer torch séparément depuis l’index CPU de PyTorch
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          
+          # Lancer les tests
+          pytest tests/
 
   build-and-deploy:
     needs: test
@@ -37,7 +39,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          lfs: true # Pour récupérer les gros fichiers modèles
+          lfs: true  # pour récupérer le modèle .pt via Git LFS
 
       - name: Azure Login
         uses: azure/login@v1
