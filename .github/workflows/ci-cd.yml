@@ -1,0 +1,64 @@
+name: NLP MultiTask CI-CD
+
+on:
+  push:
+    branches: [ main ]
+
+env:
+  ACR_NAME: acrnubhav1767816776
+  CONTAINER_APP_NAME: nlp-service
+  RESOURCE_GROUP: rg-nlp-deployment
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - name: Run Tests (Mocks)
+        run: |
+          pip install fastapi httpx pytest torch transformers sentencepiece
+          # On crée un dossier tests s'il n'existe pas
+          mkdir -p tests
+          # On lance pytest (assure-toi d'avoir créé tests/test_api.py comme vu avant)
+          pytest tests/
+
+  build-and-deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          lfs: true # Crucial pour récupérer le modèle .pt
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Login to ACR
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ env.ACR_NAME }}.azurecr.io
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      - name: Build and push image
+        run: |
+          docker build -t ${{ env.ACR_NAME }}.azurecr.io/nlp-api:${{ github.sha }} .
+          docker push ${{ env.ACR_NAME }}.azurecr.io/nlp-api:${{ github.sha }}
+
+      - name: Deploy to Azure Container App
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            az containerapp update \
+              --name ${{ env.CONTAINER_APP_NAME }} \
+              --resource-group ${{ env.RESOURCE_GROUP }} \
+              --image ${{ env.ACR_NAME }}.azurecr.io/nlp-api:${{ github.sha }} \
+              --cpu 2.0 --memory 4.0Gi

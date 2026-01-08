@@ -9,4 +9,4 @@ venv/
 *.bin
 *.model
 .vscode/
-EOF
+EOFazure_credentials.json
