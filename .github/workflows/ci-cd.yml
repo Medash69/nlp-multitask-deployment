@@ -20,10 +20,11 @@ jobs:
           python-version: '3.9'
       - name: Run Tests (Mocks)
         run: |
-          pip install fastapi httpx pytest torch transformers sentencepiece
-          # On crée un dossier tests s'il n'existe pas
-          mkdir -p tests
-          # On lance pytest (assure-toi d'avoir créé tests/test_api.py comme vu avant)
+          pip install fastapi==0.104.1 uvicorn[standard]==0.24.0 \
+                      pydantic==2.5.0 transformers==4.35.2 sentencepiece==0.1.99 \
+                      torch --index-url https://download.pytorch.org/whl/cpu \
+                      pandas numpy opencensus-ext-azure==1.1.9 \
+                      httpx pytest
           pytest tests/
 
   build-and-deploy:
@@ -34,7 +35,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          lfs: true # Crucial pour récupérer le modèle .pt
+          lfs: true
 
       - name: Azure Login
         uses: azure/login@v1
